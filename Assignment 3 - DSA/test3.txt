@@ -1,0 +1,8 @@
+LINEAR 19 1
+INSERT x
+INSERT sum 2
+ASSIGN x 1
+ASSIGN x sum(5,x)
+INSERT z
+INSERT foo 1
+ASSIGN z foo('abc')A
