@@ -158,12 +158,14 @@ public:
     int search(int key, string name, int& slot) {
         for (int i = 0; i < this->size; i++) {
             int j = h(key, i);
-            if (this->arr[j].state == State::available)
+            if (this->arr[j].state == State::available) {
                 if (this->arr[j].id == name)
                     return j;
-            if (this->arr[j].state == State::nil)
+                else
+                    slot++;
+            }
+            else 
                 return -1;
-            slot++;
         }
         return -1;
     }
@@ -197,7 +199,8 @@ public:
     //******************************************************
     //CHECK NAME
     bool checkName(string s) {
-        if (s[0] < 'a' || s[0] > 'z') return false;
+        if (s[0] < 'a' || s[0] > 'z') 
+            return false;
         for (unsigned int i = 0; i < s.size(); i++)
             if ((s[i] < 'a' || s[i] > 'z') && (s[i] < 'A' || s[i] > 'Z') && (s[i] < '0' || s[i] > '9') && s[i] != '_')
                 return false;
@@ -212,7 +215,8 @@ public:
     }
     //CHECK STRING
     bool checkString(string typ) {
-        if (typ[0] != char(39) || typ[typ.size() - 1] != char(39)) return false;
+        if (typ[0] != char(39) || typ[typ.size() - 1] != char(39)) 
+            return false;
         for (unsigned int i = 1; i < typ.size() - 1; i++)
             if ((typ[i] < '0' || typ[i] > '9') && (typ[i] < 'a' || typ[i] > 'z') && (typ[i] < 'A' || typ[i] > 'Z') && typ[i] != ' ')
                 return false;
