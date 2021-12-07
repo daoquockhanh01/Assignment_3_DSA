@@ -171,12 +171,12 @@ public:
     }
     void removeBlock(int gBlock) {
         for (unsigned int i = 0; i < this->size; i++) {
-            if (arr[i].block == gBlock) {
-                arr[i].block = 0;
-                arr[i].id = "";
-                arr[i].state = State::nil;
-                arr[i].type = "";
-                arr[i].value = "";
+            if (this->arr[i].block == gBlock) {
+                this->arr[i].block = 0;
+                this->arr[i].id = "";
+                this->arr[i].state = State::nil;
+                this->arr[i].type = "";
+                this->arr[i].value = "";
             }
         }
     }
@@ -340,29 +340,28 @@ public:
         int space = countSpace(s), slot = 0, pos = -1;
         string code, name, val1, val2;
         divideString(s, code, name, val1, val2);
-        val2 = val1;
         //VARIABLE
         if (space == 1) {
             if (contain(this->cBlock, name) == true)
-                throw Redeclared(s);
+                throw Redeclared(name);
             int key = findKey(this->cBlock, name);
             bool done = SymbolTable::insert(key, name, slot, pos);
             if (done == false)
                 throw Overflow(s);
-            arr[pos].block = this->cBlock;
+            this->arr[pos].block = this->cBlock;
         }
         //FUNCTION
         else {
             if (contain(this->cBlock, name) == true)
-                throw Redeclared(s);
+                throw Redeclared(name);
             if (this->cBlock != 0)
-                throw InvalidDeclaration(s);
+                throw InvalidDeclaration(name);
             int key = findKey(0, name);
             bool done = SymbolTable::insert(key, name, slot, pos);
             if (done == false)
                 throw Overflow(s);
-            arr[pos].block = 0;
-            arr[pos].value = "_" + val1;
+            this->arr[pos].block = 0;
+            this->arr[pos].value = "_" + val1;
         }
         cout << slot;
     }
@@ -371,6 +370,7 @@ public:
         int slot = 0;
         string code, name, val1, val2;
         divideString(s, code, name, val1, val2);
+        val2 = val1;
         //GÁN BIẾN VÀ HÀM
         if ((val1[0] < '0' || val1[0] > '9') && val1[0] != char(39)) {
             int isFunc = 0;
@@ -386,30 +386,24 @@ public:
             if (isFunc == 1) {
                 //KIỂM TRA SỰ TỒN TẠI CỦA HÀM
                 int gBlock = this->cBlock, pos1 = 0, pos2 = 0;
-                while (gBlock >= 0) {
-                    if (contain(gBlock, str, slot, pos2) == true)
-                        break;
-                    gBlock--;
-                }
-                if (gBlock < 0)
-                    throw Undeclared(s);
+                if (contain(0, str, slot, pos2) == false)
+                    throw Undeclared(str);
                 //type: number,string,number
                 //value: _number2
                 //KIỂM TRA SỰ TỒN TẠI CỦA BIẾN
-                gBlock = this->cBlock;
                 while (gBlock >= 0) {
                     if (contain(gBlock, name, slot, pos1) == true)
                         break;
                     gBlock--;
                 }
                 if (gBlock < 0)
-                    throw Undeclared(s);
+                    throw Undeclared(name);
                 //KIỂM TRA SỰ PHÙ HỢP CỦA HÀM
-                //Kiểm tra xem có phải hàm không
-                if (arr[pos2].value[0] != '_')
+                //Kiểm tra xem có thực sự phải hàm không
+                if (this->arr[pos2].value[0] != '_')
                     throw TypeMismatch(s);
                 //Kiểm tra số lượng tham số truyền vào
-                string sav = arr[pos2].value;
+                string sav = this->arr[pos2].value;
                 if (sav[1] >= '0' && sav[1] <= '9')
                     sav.erase(0, 1);
                 else if (sav[1] == 'n' || sav[1] == 's') //number and string
@@ -422,11 +416,11 @@ public:
                 //Kiểm tra sự phù hợp của tham số
                 val1.erase(0, str.size() + 1);
                 //val1 = string,number,asf)
-                if (arr[pos2].type == "") {
+                if (this->arr[pos2].type == "") {
                     bool donev = false;
                     while (val1[0] != ')') {
                         if (donev == true)
-                            arr[pos2].type += ",";
+                            this->arr[pos2].type += ",";
                         int k = 0;
                         string r = "";
                         while (val1[k] != ',' && val1[k] != ')') {
@@ -434,9 +428,9 @@ public:
                             k++;
                         }
                         if (checkNumber(r) == true)
-                            arr[pos2].type += "number";
+                            this->arr[pos2].type += "number";
                         else if (checkString(r) == true)
-                            arr[pos2].type += "string";
+                            this->arr[pos2].type += "string";
                         else {
                             int dBlock = this->cBlock, pos3 = 0;
                             while (dBlock >= 0) {
@@ -445,12 +439,12 @@ public:
                                 dBlock--;
                             }
                             if (dBlock < 0)
-                                throw Undeclared(s);
-                            if (arr[pos3].type == "")
+                                throw Undeclared(r);
+                            if (this->arr[pos3].type == "")
                                 throw TypeCannotBeInferred(s);
-                            if (arr[pos3].type != "string" && arr[pos3].type != "number")
+                            if (this->arr[pos3].type != "string" && this->arr[pos3].type != "number")
                                 throw TypeMismatch(s);
-                            arr[pos2].type += arr[pos3].type;
+                            this->arr[pos2].type += this->arr[pos3].type;
                         }
                         val1.erase(r.size());
                         if (val1[0] == ',')
@@ -459,13 +453,15 @@ public:
                     }
                 }
                 else {
-                    string maintype = arr[pos2].type;
+                    string maintype = this->arr[pos2].type;
                     while (val1[0] != ')') {
                         string r1 = "", r2 = "";
                         int k1 = 0, k2 = 0;
-                        while (maintype[k1] != ',' && maintype[k1] != ')') {
+                        while (maintype[k1] != ',') {
                             r1 += maintype[k1];
                             k1++;
+                            if (k1 >= maintype.size())
+                                break;
                         }
                         while (val1[k2] != ',' && val1[k2] != ')') {
                             r2 += maintype[k2];
@@ -487,56 +483,58 @@ public:
                                 dBlock--;
                             }
                             if (dBlock < 0)
-                                throw Undeclared(s);
-                            if (arr[pos3].type == "")
-                                arr[pos3].type = r1;
-                            else if (arr[pos3].type != r1)
+                                throw Undeclared(r2);
+                            if (this->arr[pos3].type == "")
+                                this->arr[pos3].type = r1;
+                            else if (this->arr[pos3].type != r1)
                                 throw TypeMismatch(s);
                         }
                         val1.erase(r2.size());
                         if (val1[0] == ',')
                             val1.erase(0, 1);
                         maintype.erase(r1.size());
-                        if (maintype[0] == ',')
+                        if (maintype.size() > 0)
                             maintype.erase(0, 1);
                     }
                 }
                 //Đã kiểm tra xong sự phù hợp của tham số
                 //KIỂM TRA SỰ PHÙ HỢP CỦA BIẾN
                 //Kiểm tra xem có phải hàm không
-                if (arr[pos1].value[0] == '_')
+                if (this->arr[pos1].value[0] == '_')
                     throw TypeMismatch(s);
                 //GÁN VÀ SUY DIỄN
-                //Cả 2 đều chưa có kiểu
-                if (arr[pos1].type == "" && (arr[pos2].value[1] != 'n' && arr[pos2].value[1] != 's'))
+                //Cả 2 đều chưa có kiểu trả về 
+                if (this->arr[pos1].type == "" && (this->arr[pos2].value[1] >= '0' && this->arr[pos2].value[1] <= '9'))
                     throw TypeCannotBeInferred(s);
                 //Nếu biến có kiểu
-                else if (arr[pos1].type != "" && (arr[pos2].value[1] != 'n' && arr[pos2].value[1] != 's')) {
-                    if (arr[pos2].value[1] == 'v')
-                        throw TypeMismatch(s);
-                    arr[pos2].value.erase(0, 1);
-                    arr[pos2].value = "_" + arr[pos1].type + arr[pos2].value;
-                    arr[pos1].value = val2;
+                else if (this->arr[pos1].type != "" && (this->arr[pos2].value[1] >= '0' && this->arr[pos2].value[1] <= '9')) {
+                    this->arr[pos2].value.erase(0, 1);
+                    this->arr[pos2].value = "_" + this->arr[pos1].type + this->arr[pos2].value;
+                    this->arr[pos1].value = val2;
                 }
                 //Nếu hàm có kiểu
-                else if (arr[pos1].type == "" && (arr[pos2].value[1] == 'n' || arr[pos2].value[1] == 's')) {
-                    if (arr[pos2].value[1] == 'n')
-                        arr[pos1].type = "number";
-                    else if (arr[pos2].value[1] == 's')
-                        arr[pos1].type = "string";
-                    arr[pos1].value = val2;
+                else if (this->arr[pos1].type == "" && (this->arr[pos2].value[1] < '0' || this->arr[pos2].value[1] > '9')) {
+                    if (this->arr[pos2].value[1] == 'n')
+                        this->arr[pos1].type = "number";
+                    else if (this->arr[pos2].value[1] == 's')
+                        this->arr[pos1].type = "string";
+                    else
+                        throw TypeMismatch(s);
+                    this->arr[pos1].value = val2;
                 }
                 //Nếu cả 2 đều đã có kiểu
-                else if (arr[pos1].type != "" && (arr[pos2].value[1] == 'n' || arr[pos2].value[1] == 's')) {
-                    if (arr[pos2].value[1] == 'n') {
-                        if (arr[pos1].type != "number")
+                else if (this->arr[pos1].type != "" && (this->arr[pos2].value[1] < '0' || this->arr[pos2].value[1] > '9')) {
+                    if (this->arr[pos2].value[1] == 'n') {
+                        if (this->arr[pos1].type != "number")
                             throw TypeMismatch(s);
                     }
-                    else {
-                        if (arr[pos1].type != "string")
+                    else if (this->arr[pos2].value[1] == 's') {
+                        if (this->arr[pos1].type != "string")
                             throw TypeMismatch(s);
                     }
-                    arr[pos1].value = val2;
+                    else
+                        throw TypeMismatch(s);
+                    this->arr[pos1].value = val2;
                 }
             }
             //GÁN BIẾN
@@ -549,7 +547,7 @@ public:
                     gBlock--;
                 }
                 if (gBlock < 0)
-                    throw Undeclared(s);
+                    throw Undeclared(str);
                 //KIỂM TRA SỰ TỒN TẠI CỦA BIẾN 1
                 gBlock = this->cBlock;
                 while (gBlock >= 0) {
@@ -558,19 +556,22 @@ public:
                     gBlock--;
                 }
                 if (gBlock < 0)
-                    throw Undeclared(s);
+                    throw Undeclared(name);
+                //KIỂM TRA XEM BIẾN 1 và 2 CÓ PHẢI HÀM KHÔNG
+                if (this->arr[pos2].value[0] == '_' || this->arr[pos1].value[0] == '_')
+                    throw TypeMismatch(s);
                 //NẾU CẢ HAI BIẾN ĐỀU CHƯA CÓ KIỂU
-                if (arr[pos1].type == "" && arr[pos2].type == "")
+                if (this->arr[pos1].type == "" && this->arr[pos2].type == "")
                     throw TypeCannotBeInferred(s);
                 //NẾU BIẾN 1 CÓ KIỂU
-                else if (arr[pos1].type != "" && arr[pos2].type == "")
-                    arr[pos2].type = arr[pos1].type;
+                else if (this->arr[pos1].type != "" && this->arr[pos2].type == "")
+                    this->arr[pos2].type = this->arr[pos1].type;
                 //NẾU BIẾN 2 CÓ KIỂU
-                else if (arr[pos1].type == "" && arr[pos2].type != "")
-                    arr[pos1].type = arr[pos2].type;
+                else if (this->arr[pos1].type == "" && this->arr[pos2].type != "")
+                    this->arr[pos1].type = this->arr[pos2].type;
                 //NẾU CẢ 2 BIẾN ĐỀU CÓ KIỂU
                 else {
-                    if (arr[pos1].type != arr[pos2].type)
+                    if (this->arr[pos1].type != this->arr[pos2].type)
                         throw TypeMismatch(s);
                 }
             }
@@ -585,26 +586,29 @@ public:
                 gBlock--;
             }
             if (gBlock < 0)
-                throw Undeclared(s);
+                throw Undeclared(name);
+            //KIỂM TRA XEM BIẾN ĐƯỢC GÁN CÓ PHẢI HÀM KHÔNG
+            if (this->arr[pos].value[0] == '_')
+                throw TypeMismatch(s);
             //HẰNG SỐ
             if (checkNumber(val1) == true) {
-                if (arr[pos].type == "") {
-                    arr[pos].type = "number";
-                    arr[pos].value = val1;
+                if (this->arr[pos].type == "") {
+                    this->arr[pos].type = "number";
+                    this->arr[pos].value = val1;
                 }
-                else if (arr[pos].type == "number") 
-                    arr[pos].value = val1;
+                else if (this->arr[pos].type == "number") 
+                    this->arr[pos].value = val1;
                 else
                     throw TypeMismatch(s);
             }
             //HẰNG CHUỖI
             else if (checkString(val1) == true) {
-                if (arr[pos].type == "") {
-                    arr[pos].type == "string";
-                    arr[pos].value = val1;
+                if (this->arr[pos].type == "") {
+                    this->arr[pos].type == "string";
+                    this->arr[pos].value = val1;
                 }
-                else if (arr[pos].type == "string") 
-                    arr[pos].value = val1;
+                else if (this->arr[pos].type == "string") 
+                    this->arr[pos].value = val1;
                 else
                     throw TypeMismatch(s);
             }
@@ -626,29 +630,29 @@ public:
         //KIỂM TRA SỰ TỒN TẠI CỦA HÀM
         int pos = 0;
         if (contain(0, str, slot, pos) == false)
-            throw Undeclared(s);
+            throw Undeclared(str);
         //KIỂM TRA KIỂU TRẢ VỀ
-        if (arr[pos].value[1] != 'v') {
-            if (arr[pos].value[1] >= '0' && arr[pos].value[1] <= '9') {
-                arr[pos].value.erase(0, 1);
-                arr[pos].value = "_void" + arr[pos].value;
+        if (this->arr[pos].value[1] != 'v') {
+            if (this->arr[pos].value[1] >= '0' && this->arr[pos].value[1] <= '9') {
+                this->arr[pos].value.erase(0, 1);
+                this->arr[pos].value = "_void" + this->arr[pos].value;
             }
             else
                 throw TypeMismatch(s);
         }
         //KIỂM TRA SỐ LƯỢNG THAM SỐ
-        string sav = arr[pos].value;
+        string sav = this->arr[pos].value;
         sav.erase(0, 5);
         int num_para = stoi(sav), comma = countComma(name);
         if (num_para != comma + 1)
             throw TypeMismatch(s);
         //KIỂM TRA SỰ PHÙ HỢP CỦA THAM SỐ
-        string typ = arr[pos].type;
+        string typ = this->arr[pos].type;
         if (typ == "") {
             bool done = false;
             while (name[0] != ')') {
                 if (done == true)
-                    arr[pos].type += ",";
+                    this->arr[pos].type += ",";
                 int i = 0;
                 string r = "";
                 while (name[i] != ',' && name[i] != ')') {
@@ -656,9 +660,9 @@ public:
                     i++;
                 }
                 if (checkNumber(r) == true)
-                    arr[pos].type += "number";
+                    this->arr[pos].type += "number";
                 else if (checkString(r) == true)
-                    arr[pos].type += "string";
+                    this->arr[pos].type += "string";
                 else {
                     int dBlock = this->cBlock, pos3 = 0;
                     while (dBlock >= 0) {
@@ -667,12 +671,12 @@ public:
                         dBlock--;
                     }
                     if (dBlock < 0)
-                        throw Undeclared(s);
-                    if (arr[pos3].type == "")
+                        throw Undeclared(r);
+                    if (this->arr[pos3].type == "")
                         throw TypeCannotBeInferred(s);
-                    if (arr[pos3].type != "number" && arr[pos3].type != "string")
+                    if (this->arr[pos3].type != "number" && this->arr[pos3].type != "string")
                         throw TypeMismatch(s);
-                    arr[pos].type += arr[pos3].type;
+                    this->arr[pos].type += this->arr[pos3].type;
                 }
                 name.erase(0, r.size());
                 if (name[0] == ',')
@@ -688,9 +692,11 @@ public:
                     r1 += name[i];
                     i++;
                 }
-                while (typ[j] != ',' && typ[j] != ')') {
+                while (typ[j] != ',') {
                     r2 += typ[j];
                     j++;
+                    if (j >= typ.size())
+                        break;
                 }
                 if (checkNumber(r1) == true) {
                     if (r2 != "number")
@@ -708,17 +714,17 @@ public:
                         dBlock--;
                     }
                     if (dBlock < 0)
-                        throw Undeclared(s);
-                    if (arr[pos1].type == "")
-                        arr[pos1].type = r2;
-                    else if (arr[pos1].type != r2)
+                        throw Undeclared(r1);
+                    if (this->arr[pos1].type == "")
+                        this->arr[pos1].type = r2;
+                    else if (this->arr[pos1].type != r2)
                         throw TypeMismatch(s);
                 }
                 name.erase(0, r1.size());
                 if (name[0] == ',')
                     name.erase(0, 1);
                 typ.erase(0, r2.size());
-                if (typ[0] == ',')
+                if (typ.size() > 0)
                     typ.erase(0, 1);
             }
         }
@@ -746,7 +752,7 @@ public:
             gBlock--;
         }
         if (gBlock < 0)
-            throw Undeclared(s);
+            throw Undeclared(name);
         cout << pos;
     }
     //PRINT
@@ -755,11 +761,13 @@ public:
         for (int i = 0; i < this->size; i++) {
             if (done == true)
                 cout << ";";
-            if (arr[i].state == State::available) {
-                cout << i << " " << arr[i].id << "//" << arr[i].block;
+            if (this->arr[i].state == State::available) {
+                cout << i << " " << this->arr[i].id << "//" << this->arr[i].block;
                 done = true;
             }
         }
+        if (done == true)
+            cout << '\n';
     }
     void CheckClose() {
         if (this->cBlock != 0)
@@ -775,3 +783,6 @@ public:
 
 };
 #endif
+
+//LƯU Ý RẰNG VIỆC THROW RA LỖI MÀ KHÔNG DELETE BỘ NHỚ TỪ TRƯỚC CÓ THỂ SINH RA LỖI
+//--> cứ thử xem, lỗi thì tạo một hàm delete[] this->arr riêng sau đó trước mỗi cái throw đều bơm vào

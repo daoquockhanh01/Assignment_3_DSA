@@ -10,15 +10,15 @@ void SymbolTable::run(string filename) {
         divideString(s, code, name, val1, val2);
         if (code == "INSERT") {
             SymbolTable::SymbolInsert(s);
-            cout << endl;
+            cout << '\n';
         }
         else if (code == "ASSIGN") {
             SymbolTable::SymbolAssign(s);
-            cout << endl;
+            cout << '\n';
         }
         else if (code == "CALL") {
             SymbolTable::SymbolCall(s);
-            cout << endl;
+            cout << '\n';
         }
         else if (code == "BEGIN") {
             SymbolTable::SymbolBegin(s);
@@ -28,7 +28,7 @@ void SymbolTable::run(string filename) {
         }
         else if (code == "LOOKUP") {
             SymbolTable::SymbolLookup(s);
-            cout << endl;
+            cout << '\n';
         }
         else if (code == "PRINT") {
             SymbolTable::SymbolPrint(s);
