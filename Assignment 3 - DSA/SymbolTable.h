@@ -52,14 +52,16 @@ public:
     int h2(int k, int m) {
         return (k % (m - 2)) + 1;
     }
+    //(a + b) % c = (a % c + b % c ) % c.
+    //(a * b) % c = ((a % c) * (b % c)) % c
     int Linear(int m, int c, int k, int i) {
-        return (h1(k, m) + c * i) % m;
+        return (h1(k, m) + ((c % m) * (i % m)) % m) % m;
     }
     int Quadratic(int m, int c1, int c2, int k, int i) {
-        return (h1(k, m) + c1 * i + c2 * i * i) % m;
+        return (h1(k, m) + ((c1 % m) * (i % m)) % m + ((c2 % m) * (i % m) * (i % m)) % m) % m;
     }
     int Double(int m, int c, int k, int i) {
-        return (h1(k, m) + c * i * h2(k, m)) % m;
+        return (h1(k, m) + ((((c % m) * (i % m)) % m) * h2(k, m)) % m) % m;
     }
     int countComma(string s) {
         int ans = 0;
@@ -141,6 +143,7 @@ public:
             return Quadratic(this->size, this->c1, this->c2, k, i);
         if (this->metd == Method::DOUBLE)
             return Double(this->size, this->c1, k, i);
+        return 0;
     }
     bool insert(int key, string name, int& slot, int& pos) {
         for (int i = 0; i < this->size; i++) {
@@ -170,7 +173,7 @@ public:
         return -1;
     }
     void removeBlock(int gBlock) {
-        for (unsigned int i = 0; i < this->size; i++) {
+        for (unsigned int i = 0; i < (unsigned int)this->size; i++) {
             if (this->arr[i].block == gBlock) {
                 this->arr[i].block = 0;
                 this->arr[i].id = "";
@@ -460,7 +463,7 @@ public:
                         while (maintype[k1] != ',') {
                             r1 += maintype[k1];
                             k1++;
-                            if (k1 >= maintype.size())
+                            if ((unsigned int)k1 >= maintype.size())
                                 break;
                         }
                         while (val1[k2] != ',' && val1[k2] != ')') {
@@ -604,7 +607,7 @@ public:
             //HẰNG CHUỖI
             else if (checkString(val1) == true) {
                 if (this->arr[pos].type == "") {
-                    this->arr[pos].type == "string";
+                    this->arr[pos].type = "string";
                     this->arr[pos].value = val1;
                 }
                 else if (this->arr[pos].type == "string") 
@@ -695,7 +698,7 @@ public:
                 while (typ[j] != ',') {
                     r2 += typ[j];
                     j++;
-                    if (j >= typ.size())
+                    if ((unsigned int)j >= typ.size())
                         break;
                 }
                 if (checkNumber(r1) == true) {
