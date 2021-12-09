@@ -405,6 +405,10 @@ public:
                 //Kiểm tra xem có thực sự phải hàm không
                 if (this->arr[pos2].value[0] != '_')
                     throw TypeMismatch(s);
+                //KIỂM TRA SỰ PHÙ HỢP CỦA BIẾN
+                //Kiểm tra xem có phải hàm không
+                if (this->arr[pos1].value[0] == '_')
+                    throw TypeMismatch(s);
                 //Kiểm tra số lượng tham số truyền vào
                 string sav = this->arr[pos2].value;
                 if (sav[1] >= '0' && sav[1] <= '9')
@@ -449,7 +453,7 @@ public:
                                 throw TypeMismatch(s);
                             this->arr[pos2].type += this->arr[pos3].type;
                         }
-                        val1.erase(r.size());
+                        val1.erase(0, r.size());
                         if (val1[0] == ',')
                             val1.erase(0, 1);
                         donev = true;
@@ -492,19 +496,15 @@ public:
                             else if (this->arr[pos3].type != r1)
                                 throw TypeMismatch(s);
                         }
-                        val1.erase(r2.size());
+                        val1.erase(0, r2.size());
                         if (val1[0] == ',')
                             val1.erase(0, 1);
-                        maintype.erase(r1.size());
+                        maintype.erase(0, r1.size());
                         if (maintype.size() > 0)
                             maintype.erase(0, 1);
                     }
                 }
                 //Đã kiểm tra xong sự phù hợp của tham số
-                //KIỂM TRA SỰ PHÙ HỢP CỦA BIẾN
-                //Kiểm tra xem có phải hàm không
-                if (this->arr[pos1].value[0] == '_')
-                    throw TypeMismatch(s);
                 //GÁN VÀ SUY DIỄN
                 //Cả 2 đều chưa có kiểu trả về 
                 if (this->arr[pos1].type == "" && (this->arr[pos2].value[1] >= '0' && this->arr[pos2].value[1] <= '9'))
@@ -629,7 +629,7 @@ public:
             str += name[k];
             k++;
         }
-        name.erase(str.size() + 1);
+        name.erase(0, str.size() + 1);
         //KIỂM TRA SỰ TỒN TẠI CỦA HÀM
         int pos = 0;
         if (contain(0, str, slot, pos) == false)
@@ -762,9 +762,9 @@ public:
     void SymbolPrint(string s) {
         bool done = false;
         for (int i = 0; i < this->size; i++) {
-            if (done == true)
-                cout << ";";
             if (this->arr[i].state == State::available) {
+                if (done == true)
+                    cout << ";";
                 cout << i << " " << this->arr[i].id << "//" << this->arr[i].block;
                 done = true;
             }
