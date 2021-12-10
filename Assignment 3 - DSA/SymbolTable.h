@@ -46,21 +46,21 @@ public:
         this->c2 = 0;
     }
     void run(string filename);
-    int h1(int k, int m) {
+    unsigned int h1(long long int k, unsigned int m) {
         return k % m;
     }
-    int h2(int k, int m) {
+    unsigned int h2(long long int k, unsigned int m) {
         return (k % (m - 2)) + 1;
     }
     //(a + b) % c = (a % c + b % c ) % c.
     //(a * b) % c = ((a % c) * (b % c)) % c
-    int Linear(int m, int c, int k, int i) {
+    unsigned int Linear(unsigned int m, int c, long long int k, unsigned int i) {
         return (h1(k, m) + ((c % m) * (i % m)) % m) % m;
     }
-    int Quadratic(int m, int c1, int c2, int k, int i) {
-        return (h1(k, m) + ((c1 % m) * (i % m)) % m + ((c2 % m) * (i % m) * (i % m)) % m) % m;
+    unsigned int Quadratic(unsigned int m, int c1, int c2, long long int k, unsigned int i) {
+        return (h1(k, m) + ((c1 % m) * (i % m)) % m + ((((c2 % m) * (i % m)) % m) * (i % m)) % m) % m;
     }
-    int Double(int m, int c, int k, int i) {
+    unsigned int Double(unsigned int m, int c, long long int k, unsigned int i) {
         return (h1(k, m) + ((((c % m) * (i % m)) % m) * h2(k, m)) % m) % m;
     }
     int countComma(string s) {
@@ -122,21 +122,21 @@ public:
             }
         }
     }
-    int findKey(int c, string s) {
-        int ans = c;
+    long long int findKey(int c, string s) {
+        long long int ans = (long long int)c;
         for (unsigned int i = 0; i < s.size(); i++) {
             int g = (int)s[i] - 48;
             if ((s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || s[i] == '_')
-                ans = ans * 100 + g;
-            else 
-                ans = ans * 10 + g;
+                ans = ans * 100 + (long long int)g;
+            else
+                ans = ans * 10 + (long long int)g;
         }
         return ans;
     }
     //******************************************************
     //BASIC METHODS OF HASH TABLE***************************
     //******************************************************
-    int h(int k, int i) {
+    unsigned int h(long long int k, unsigned int i) {
         if (this->metd == Method::LINEAR)
             return Linear(this->size, this->c1, k, i);
         if (this->metd == Method::QUADRATIC)
@@ -145,7 +145,7 @@ public:
             return Double(this->size, this->c1, k, i);
         return 0;
     }
-    bool insert(int key, string name, int& slot, int& pos) {
+    bool insert(long long int key, string name, int& slot, int& pos) {
         for (int i = 0; i < this->size; i++) {
             int j = h(key, i);
             if (this->arr[j].state == State::nil) {
@@ -158,7 +158,7 @@ public:
         }
         return false;
     }
-    int search(int key, string name, int& slot) {
+    int search(long long int key, string name, int& slot) {
         for (int i = 0; i < this->size; i++) {
             int j = h(key, i);
             if (this->arr[j].state == State::available) {
@@ -184,14 +184,15 @@ public:
         }
     }
     bool contain(int gBlock, string name) {
-        int key = findKey(gBlock, name), slot = 0;
-        int pos = SymbolTable::search(key, name, slot);
+        long long int key = findKey(gBlock, name);
+        int slot = 0;
+        unsigned int pos = SymbolTable::search(key, name, slot);
         if (pos == -1)
             return false;
         return true;
     }
     bool contain(int gBlock, string name, int& slot, int& pos) {
-        int key = findKey(gBlock, name);
+        long long int key = findKey(gBlock, name);
         pos = SymbolTable::search(key, name, slot);
         if (pos == -1)
             return false;
@@ -347,7 +348,7 @@ public:
         if (space == 1) {
             if (contain(this->cBlock, name) == true)
                 throw Redeclared(name);
-            int key = findKey(this->cBlock, name);
+            long long int key = findKey(this->cBlock, name);
             bool done = SymbolTable::insert(key, name, slot, pos);
             if (done == false)
                 throw Overflow(s);
@@ -359,7 +360,7 @@ public:
                 throw Redeclared(name);
             if (this->cBlock != 0)
                 throw InvalidDeclaration(name);
-            int key = findKey(0, name);
+            long long int key = findKey(0, name);
             bool done = SymbolTable::insert(key, name, slot, pos);
             if (done == false)
                 throw Overflow(s);
