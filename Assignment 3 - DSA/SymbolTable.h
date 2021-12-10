@@ -633,8 +633,11 @@ public:
         name.erase(0, str.size() + 1);
         //KIỂM TRA SỰ TỒN TẠI CỦA HÀM
         int pos = 0;
-        if (contain(0, str, slot, pos) == false)
+        if (contain(0, str, slot, pos) == false) 
             throw Undeclared(str);
+        //KIỂM TRA XEM CÓ THỰC SỰ PHẢI HÀM KHÔNG
+        if (this->arr[pos].value[0] != '_')
+            throw TypeMismatch(s);
         //KIỂM TRA KIỂU TRẢ VỀ
         if (this->arr[pos].value[1] != 'v') {
             if (this->arr[pos].value[1] >= '0' && this->arr[pos].value[1] <= '9') {
@@ -676,6 +679,8 @@ public:
                     }
                     if (dBlock < 0)
                         throw Undeclared(r);
+                    if (this->arr[pos].value[0] == '_')
+                        throw TypeMismatch(s);
                     if (this->arr[pos3].type == "")
                         throw TypeCannotBeInferred(s);
                     if (this->arr[pos3].type != "number" && this->arr[pos3].type != "string")

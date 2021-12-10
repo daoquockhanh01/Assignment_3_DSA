@@ -1,4 +1,3 @@
 0
-31 kRbjvQ//0
-TypeMismatch: ASSIGN ch kRbjvQ('MO4X',kRbjvQ,kRbjvQ)
-THIS IS THE END.
+0
+Invalid: CALL w()
