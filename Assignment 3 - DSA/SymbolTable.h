@@ -637,7 +637,7 @@ public:
             throw Undeclared(str);
         //KIỂM TRA XEM CÓ THỰC SỰ PHẢI HÀM KHÔNG
         if (this->arr[pos].value[0] != '_')
-            throw TypeMismatch(s);
+            throw InvalidInstruction(s);
         //KIỂM TRA KIỂU TRẢ VỀ
         if (this->arr[pos].value[1] != 'v') {
             if (this->arr[pos].value[1] >= '0' && this->arr[pos].value[1] <= '9') {
