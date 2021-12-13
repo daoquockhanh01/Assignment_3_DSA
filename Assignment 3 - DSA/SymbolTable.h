@@ -93,7 +93,16 @@ public:
         if (space >= 1) {
             pos = 0;
             s.erase(0, code.size() + 1);
-            while (s[pos] != ' ' && s[pos] != '\n') {
+            bool done = false;
+            while (s[pos] != '\n') {
+                if (done == true && s[pos] == char(39))
+                    done = false;
+                else if (done == false) {
+                    if (s[pos] == ' ')
+                        break;
+                    if (s[pos] == char(39))
+                        done = true;
+                }
                 name += s[pos];
                 pos++;
                 if ((unsigned int)pos > s.size() - 1) break;
@@ -400,10 +409,6 @@ public:
                     throw TypeMismatch(s);
                 //Kiểm tra kiểu void
                 if (this->arr[pos2].value[1] == 'v')
-                    throw TypeMismatch(s);
-                //KIỂM TRA SỰ PHÙ HỢP CỦA BIẾN
-                //Kiểm tra xem có phải hàm không
-                if (this->arr[pos1].value[0] == '_')
                     throw TypeMismatch(s);
                 //Kiểm tra số lượng tham số truyền vào
                 string sav = this->arr[pos2].value;

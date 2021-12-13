@@ -1,10 +1,5 @@
-DOUBLE 31 289
-INSERT uzq 3
-LOOKUP uzq
-CALL uzq('u',uzq,' fm')
-ASSIGN uzq uzq(710,'aq4wT',716)
-CALL uzq(291,'eY',uzq)
-CALL uzq(uzq,975,885)
-END
+QUADRATIC 25 798 372
+INSERT d
 BEGIN
+INSERT d
 END
