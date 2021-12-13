@@ -1,3 +1,2 @@
 0
-0
-Invalid: CALL w()
+TypeMismatch: CALL jG6vs('x ',jG6vs)

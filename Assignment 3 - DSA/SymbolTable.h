@@ -394,14 +394,6 @@ public:
                     throw Undeclared(str);
                 //type: number,string,number
                 //value: _number2
-                //KIỂM TRA SỰ TỒN TẠI CỦA BIẾN
-                while (gBlock >= 0) {
-                    if (contain(gBlock, name, slot, pos1) == true)
-                        break;
-                    gBlock--;
-                }
-                if (gBlock < 0)
-                    throw Undeclared(name);
                 //KIỂM TRA SỰ PHÙ HỢP CỦA HÀM
                 //Kiểm tra xem có thực sự phải hàm không
                 if (this->arr[pos2].value[0] != '_')
@@ -446,8 +438,12 @@ public:
                                     break;
                                 dBlock--;
                             }
+                            if (this->arr[pos3].value[0] == '_')
+                                throw TypeMismatch(s);
                             if (dBlock < 0)
                                 throw Undeclared(r);
+                            if (this->arr[pos3].value[0] == '_')
+                                throw TypeMismatch(s);
                             if (this->arr[pos3].type == "")
                                 throw TypeCannotBeInferred(s);
                             if (this->arr[pos3].type != "string" && this->arr[pos3].type != "number")
@@ -506,6 +502,17 @@ public:
                     }
                 }
                 //Đã kiểm tra xong sự phù hợp của tham số
+                //KIỂM TRA SỰ TỒN TẠI CỦA BIẾN
+                while (gBlock >= 0) {
+                    if (contain(gBlock, name, slot, pos1) == true)
+                        break;
+                    gBlock--;
+                }
+                if (gBlock < 0)
+                    throw Undeclared(name);
+                //KIỂM TRA XEM BIẾN ĐƯỢC GÁN CÓ PHẢI HÀM KHÔNG
+                if (this->arr[pos1].value[0] == '_')
+                    throw TypeMismatch(s);
                 //GÁN VÀ SUY DIỄN
                 //Cả 2 đều chưa có kiểu trả về 
                 if (this->arr[pos1].type == "" && (this->arr[pos2].value[1] >= '0' && this->arr[pos2].value[1] <= '9'))
@@ -632,12 +639,19 @@ public:
         }
         name.erase(0, str.size() + 1);
         //KIỂM TRA SỰ TỒN TẠI CỦA HÀM
-        int pos = 0;
-        if (contain(0, str, slot, pos) == false) 
+        int vBlock = this->cBlock, pos = 0;
+        while (vBlock >= 0) {
+            if (contain(vBlock, str, slot, pos) == true)
+                break;
+            vBlock--;
+        }
+        if (vBlock < 0)
             throw Undeclared(str);
         //KIỂM TRA XEM CÓ THỰC SỰ PHẢI HÀM KHÔNG
         if (this->arr[pos].value[0] != '_')
-            throw InvalidInstruction(s);
+            throw TypeMismatch(s);
+        if (contain(0, str, slot, pos) == false)
+            throw Undeclared(str);
         //KIỂM TRA KIỂU TRẢ VỀ
         if (this->arr[pos].value[1] != 'v') {
             if (this->arr[pos].value[1] >= '0' && this->arr[pos].value[1] <= '9') {
@@ -679,7 +693,7 @@ public:
                     }
                     if (dBlock < 0)
                         throw Undeclared(r);
-                    if (this->arr[pos].value[0] == '_')
+                    if (this->arr[pos3].value[0] == '_')
                         throw TypeMismatch(s);
                     if (this->arr[pos3].type == "")
                         throw TypeCannotBeInferred(s);
@@ -722,6 +736,8 @@ public:
                             break;
                         dBlock--;
                     }
+                    if (this->arr[pos1].value[0] == '_')
+                        throw TypeMismatch(s);
                     if (dBlock < 0)
                         throw Undeclared(r1);
                     if (this->arr[pos1].type == "")
