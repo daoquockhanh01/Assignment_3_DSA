@@ -398,6 +398,9 @@ public:
                 //Kiểm tra xem có thực sự phải hàm không
                 if (this->arr[pos2].value[0] != '_')
                     throw TypeMismatch(s);
+                //Kiểm tra kiểu void
+                if (this->arr[pos2].value[1] == 'v')
+                    throw TypeMismatch(s);
                 //KIỂM TRA SỰ PHÙ HỢP CỦA BIẾN
                 //Kiểm tra xem có phải hàm không
                 if (this->arr[pos1].value[0] == '_')
@@ -691,6 +694,8 @@ public:
                             break;
                         dBlock--;
                     }
+                    if (this->arr[pos3].value[0] == '_')
+                        throw TypeMismatch(s);
                     if (dBlock < 0)
                         throw Undeclared(r);
                     if (this->arr[pos3].value[0] == '_')

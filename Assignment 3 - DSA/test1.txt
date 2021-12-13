@@ -1,6 +1,10 @@
-QUADRATIC 40 143 802
-INSERT oE 3
-CALL oE(191,479,520)
+DOUBLE 31 289
+INSERT uzq 3
+LOOKUP uzq
+CALL uzq('u',uzq,' fm')
+ASSIGN uzq uzq(710,'aq4wT',716)
+CALL uzq(291,'eY',uzq)
+CALL uzq(uzq,975,885)
+END
 BEGIN
-BEGIN
-ASSIGN oE oE(oE,oE,oE)
+END
