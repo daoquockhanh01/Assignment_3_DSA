@@ -181,6 +181,20 @@ public:
         }
         return -1;
     }
+    int search(long long int key, string name, int& slot, int gBlock) {
+        for (int i = 0; i < this->size; i++) {
+            int j = h(key, i);
+            if (this->arr[j].state == State::available) {
+                if (this->arr[j].id == name && this->arr[j].block == gBlock)
+                    return j;
+                else
+                    slot++;
+            }
+            else
+                return -1;
+        }
+        return -1;
+    }
     void removeBlock(int gBlock) {
         for (unsigned int i = 0; i < (unsigned int)this->size; i++) {
             if (this->arr[i].block == gBlock) {
@@ -195,14 +209,14 @@ public:
     bool contain(int gBlock, string name) {
         long long int key = findKey(gBlock, name);
         int slot = 0;
-        unsigned int pos = SymbolTable::search(key, name, slot);
-        if (pos == -1)
+        unsigned int pos = SymbolTable::search(key, name, slot, gBlock);
+        if ((int)pos == -1)
             return false;
         return true;
     }
     bool contain(int gBlock, string name, int& slot, int& pos) {
         long long int key = findKey(gBlock, name);
-        pos = SymbolTable::search(key, name, slot);
+        pos = SymbolTable::search(key, name, slot, gBlock);
         if (pos == -1)
             return false;
         return true;
@@ -647,14 +661,16 @@ public:
         }
         name.erase(0, str.size() + 1);
         //KIỂM TRA SỰ TỒN TẠI CỦA HÀM
-        int vBlock = this->cBlock, pos = 0;
-        while (vBlock >= 0) {
-            if (contain(vBlock, str, slot, pos) == true)
-                break;
-            vBlock--;
-        }
-        if (vBlock < 0)
+        int pos = 0;
+        if (contain(0, str, slot, pos) == false) {
+            int vBlock = this->cBlock, slot2 = slot;
+            while (vBlock >= 0) {
+                if (contain(vBlock, str, slot2, pos) == true)
+                    throw TypeMismatch(s);
+                vBlock--;
+            }
             throw Undeclared(str);
+        }
         //KIỂM TRA XEM CÓ THỰC SỰ PHẢI HÀM KHÔNG
         if (this->arr[pos].value[0] != '_')
             throw TypeMismatch(s);
