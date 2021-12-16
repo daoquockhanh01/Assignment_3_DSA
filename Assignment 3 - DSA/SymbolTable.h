@@ -413,8 +413,15 @@ public:
             if (isFunc == 1) {
                 //KIỂM TRA SỰ TỒN TẠI CỦA HÀM
                 int gBlock = this->cBlock, pos1 = 0, pos2 = 0;
-                if (contain(0, str, slot, pos2) == false)
+                if (contain(0, str, slot, pos2) == false) {
+                    int vBlock = this->cBlock, slot2 = slot;
+                    while (vBlock >= 0) {
+                        if (contain(vBlock, str, slot2, pos2) == true)
+                            throw TypeMismatch(s);
+                        vBlock--;
+                    }
                     throw Undeclared(str);
+                }
                 //type: number,string,number
                 //value: _number2
                 //KIỂM TRA SỰ PHÙ HỢP CỦA HÀM
